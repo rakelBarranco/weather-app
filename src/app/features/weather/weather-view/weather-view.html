@@ -1,0 +1,41 @@
+<div class="min-h-screen flex flex-col items-center justify-center p-6 gap-6 transition-all duration-1000"
+     [style.background]="background()">
+
+  <div class="flex gap-2 w-full max-w-md">
+    <input
+      type="text"
+      [(ngModel)]="city"
+      (keyup.enter)="searchWeather()"
+      placeholder="Busca una ciudad..."
+      class="flex-1 px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/50 outline-none focus:border-white/40 backdrop-blur-md"
+    />
+    <button
+      (click)="searchWeather()"
+      class="px-5 py-3 rounded-xl bg-white/20 text-white font-medium hover:bg-white/30 transition backdrop-blur-md"
+    >
+      Buscar
+    </button>
+  </div>
+
+  @if (loading()) {
+    <p class="text-white/70">Cargando...</p>
+  }
+
+  @if (error()) {
+    <p class="text-red-300">No se encontró la ciudad. Inténtalo de nuevo.</p>
+  }
+
+  @if (weather(); as w) {
+    <div class="text-white text-center">
+      <h2 class="text-2xl font-semibold">{{ w.city }}, {{ w.country }}</h2>
+      <p class="text-6xl font-light my-2">{{ w.temp }}°</p>
+      <p class="capitalize">{{ w.description }}</p>
+      <div class="flex gap-6 mt-4 justify-center">
+        <span>Humedad: {{ w.humidity }}%</span>
+        <span>Viento: {{ w.windSpeed }} km/h</span>
+        <span>Sensación: {{ w.feelsLike }}°</span>
+      </div>
+    </div>
+  }
+
+</div>
