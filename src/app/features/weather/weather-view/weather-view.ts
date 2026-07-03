@@ -1,6 +1,6 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {CloudSun, LucideAngularModule} from 'lucide-angular';
+import {CloudSun,MapPin, LucideAngularModule} from 'lucide-angular';
 import { WeatherService } from '../../../core/services/weather.service';
 import {ForecastDay, Weather} from '../../../core/models/weather.model';
 import { SKY_GRADIENTS, WEATHER_ICONS, TimeOfDay } from '../weather.constants';
@@ -15,6 +15,8 @@ export default class WeatherViewComponent {
   private weatherService = inject(WeatherService);
 
   readonly CloudSun = CloudSun;
+  readonly MapPin = MapPin;
+
   city = signal('');
   weather = signal<Weather | null>(null);
   loading = signal(false);
@@ -74,6 +76,43 @@ export default class WeatherViewComponent {
 
   getIcon(iconCode: string) {
     return WEATHER_ICONS[iconCode] ?? null;
+  }
+
+  useMyLocation() {
+    if (!navigator.geolocation) {
+      this.error.set(true);
+      return;
+    }
+
+    this.loading.set(true);
+    this.error.set(false);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+
+        this.weatherService.getWeatherByCoords(latitude, longitude).subscribe({
+          next: (data) => {
+            this.weather.set(data);
+            this.loading.set(false);
+          },
+          error: () => {
+            this.error.set(true);
+            this.weather.set(null);
+            this.loading.set(false);
+          }
+        });
+
+        this.weatherService.getForecastByCoords(latitude, longitude).subscribe({
+          next: (data) => this.forecast.set(data),
+          error: () => this.forecast.set([])
+        });
+      },
+      () => {
+        this.error.set(true);
+        this.loading.set(false);
+      }
+    );
   }
 
 }

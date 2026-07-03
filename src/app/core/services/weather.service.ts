@@ -75,4 +75,20 @@ export class WeatherService {
         };
       });
   }
+
+  getWeatherByCoords(lat: number, lon: number): Observable<Weather> {
+    const url = `${this.baseUrl}/weather?lat=${lat}&lon=${lon}&units=metric&lang=es&appid=${this.apiKey}`;
+
+    return this.http.get<any>(url).pipe(
+      map(response => this.mapToWeather(response))
+    );
+  }
+
+  getForecastByCoords(lat: number, lon: number): Observable<ForecastDay[]> {
+    const url = `${this.baseUrl}/forecast?lat=${lat}&lon=${lon}&units=metric&lang=es&appid=${this.apiKey}`;
+
+    return this.http.get<any>(url).pipe(
+      map(response => this.mapToForecast(response))
+    );
+  }
 }
