@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { Weather } from '../models/weather.model';
+import {ForecastDay, Weather} from '../models/weather.model';
 import {environment} from '../../../environments/enviroment';
 
 @Injectable({
@@ -35,5 +35,44 @@ export class WeatherService {
       sunset: data.sys.sunset,
       timezone: data.timezone
     };
+  }
+
+  getForecastByCity(city: string): Observable<ForecastDay[]> {
+    const url = `${this.baseUrl}/forecast?q=${city}&units=metric&lang=es&appid=${this.apiKey}`;
+
+    return this.http.get<any>(url).pipe(
+      map(response => this.mapToForecast(response))
+    );
+  }
+
+  private mapToForecast(data: any): ForecastDay[] {
+    const grouped: { [date: string]: any[] } = {};
+
+    for (const item of data.list) {
+      const date = item.dt_txt.split(' ')[0];
+      if (!grouped[date]) {
+        grouped[date] = [];
+      }
+      grouped[date].push(item);
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+
+    return Object.keys(grouped)
+      .filter(date => date !== today)
+      .slice(0, 5)
+      .map(date => {
+        const items = grouped[date];
+        const temps = items.map(i => i.main.temp);
+        const midday = items.find(i => i.dt_txt.includes('12:00:00')) ?? items[0];
+
+        return {
+          date: midday.dt,
+          tempMin: Math.round(Math.min(...temps)),
+          tempMax: Math.round(Math.max(...temps)),
+          icon: midday.weather[0].icon,
+          description: midday.weather[0].description
+        };
+      });
   }
 }

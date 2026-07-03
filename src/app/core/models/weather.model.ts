@@ -12,3 +12,13 @@ export interface Weather {
   sunset: number;
   timezone: number;
 }
+
+export interface ForecastDay {
+  date: number;
+  tempMin: number;
+  tempMax: number;
+  icon: string;
+  description: string;
+}
+
+

@@ -2,7 +2,7 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {CloudSun, LucideAngularModule} from 'lucide-angular';
 import { WeatherService } from '../../../core/services/weather.service';
-import { Weather } from '../../../core/models/weather.model';
+import {ForecastDay, Weather} from '../../../core/models/weather.model';
 import { SKY_GRADIENTS, WEATHER_ICONS, TimeOfDay } from '../weather.constants';
 
 @Component({
@@ -19,6 +19,7 @@ export default class WeatherViewComponent {
   weather = signal<Weather | null>(null);
   loading = signal(false);
   error = signal(false);
+  forecast = signal<ForecastDay[]>([]);
 
   timeOfDay = computed<TimeOfDay>(() => {
     const w = this.weather();
@@ -55,10 +56,24 @@ export default class WeatherViewComponent {
       error: () => {
         this.error.set(true);
         this.weather.set(null);
+        this.forecast.set([]);
         this.loading.set(false);
       }
     });
+
+    this.weatherService.getForecastByCity(cityName).subscribe({
+      next: (data) => this.forecast.set(data),
+      error: () => this.forecast.set([])
+    });
   }
 
+  getDayName(timestamp: number): string {
+    const date = new Date(timestamp * 1000);
+    return date.toLocaleDateString('es-ES', { weekday: 'short' });
+  }
+
+  getIcon(iconCode: string) {
+    return WEATHER_ICONS[iconCode] ?? null;
+  }
 
 }
