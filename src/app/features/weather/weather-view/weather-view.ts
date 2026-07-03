@@ -1,6 +1,6 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule } from 'lucide-angular';
+import {CloudSun, LucideAngularModule} from 'lucide-angular';
 import { WeatherService } from '../../../core/services/weather.service';
 import { Weather } from '../../../core/models/weather.model';
 import { SKY_GRADIENTS, WEATHER_ICONS, TimeOfDay } from '../weather.constants';
@@ -14,6 +14,7 @@ import { SKY_GRADIENTS, WEATHER_ICONS, TimeOfDay } from '../weather.constants';
 export default class WeatherViewComponent {
   private weatherService = inject(WeatherService);
 
+  readonly CloudSun = CloudSun;
   city = signal('');
   weather = signal<Weather | null>(null);
   loading = signal(false);
@@ -58,4 +59,6 @@ export default class WeatherViewComponent {
       }
     });
   }
+
+
 }

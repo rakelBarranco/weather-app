@@ -25,6 +25,14 @@
     <p class="text-red-300">No se encontró la ciudad. Inténtalo de nuevo.</p>
   }
 
+  @if (!weather() && !loading() && !error()) {
+    <div class="text-center text-white/80 mt-8">
+      <lucide-icon [img]="CloudSun" [size]="64" [strokeWidth]="1.2" class="mx-auto mb-4 opacity-70"></lucide-icon>
+      <p class="text-xl font-light">Busca una ciudad para ver su tiempo</p>
+      <p class="text-sm text-white/50 mt-1">Escribe el nombre de cualquier ciudad del mundo</p>
+    </div>
+  }
+
   @if (weather(); as weather) {
     <div class="text-white text-center">
       <h2 class="text-2xl font-semibold">{{ weather.city }}, {{ weather.country }}</h2>
