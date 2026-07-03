@@ -1,20 +1,46 @@
 <div class="min-h-screen flex flex-col items-center justify-center p-6 gap-6 transition-all duration-1000"
      [style.background]="background()">
 
-  <div class="flex gap-2 w-full max-w-md">
-    <input
-      type="text"
-      [(ngModel)]="city"
-      (keyup.enter)="searchWeather()"
-      placeholder="Busca una ciudad..."
-      class="flex-1 px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/50 outline-none focus:border-white/40 backdrop-blur-md"
-    />
-    <button
-      (click)="searchWeather()"
-      class="px-5 py-3 rounded-xl bg-white/20 text-white font-medium hover:bg-white/30 transition backdrop-blur-md"
-    >
-      Buscar
-    </button>
+  <div class="w-full max-w-md relative">
+    <div class="flex gap-2">
+      <input
+        type="text"
+        [(ngModel)]="city"
+        (keyup.enter)="onEnter()"
+        (keydown.arrowdown)="onArrowDown(); $event.preventDefault()"
+        (keydown.arrowup)="onArrowUp(); $event.preventDefault()"
+        placeholder="Busca una ciudad..."
+        class="flex-1 px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/50 outline-none focus:border-white/40 backdrop-blur-md"
+      />
+      <button
+        (click)="useMyLocation()"
+        title="Usar mi ubicación"
+        class="px-4 py-3 rounded-xl bg-white/20 text-white hover:bg-white/30 transition backdrop-blur-md flex items-center justify-center"
+      >
+        <lucide-icon [img]="MapPin" [size]="20"></lucide-icon>
+      </button>
+    </div>
+
+    @if (suggestions().length > 0) {
+      <ul class="absolute z-10 w-full mt-2 rounded-xl bg-slate-800/95 border border-white/15 backdrop-blur-md overflow-hidden">
+        @for (suggestion of suggestions(); track suggestion.lat + '-' + suggestion.lon; let i = $index) {
+          <li
+            (click)="selectCity(suggestion)"
+            (mouseenter)="highlightedIndex.set(i)"
+            [ngClass]="{ 'bg-white/10': highlightedIndex() === i }"
+            class="px-4 py-3 text-white hover:bg-white/10 cursor-pointer transition flex items-center gap-2"
+          >
+          <lucide-icon [img]="MapPin" [size]="16" class="text-white/50"></lucide-icon>
+          <span>
+          {{ suggestion.name }}<span class="text-white/50">, {{ suggestion.country }}</span>
+            @if (suggestion.state) {
+              <span class="text-white/40 text-sm"> ({{ suggestion.state }})</span>
+            }
+        </span>
+          </li>
+        }
+      </ul>
+    }
   </div>
 
   @if (loading()) {
