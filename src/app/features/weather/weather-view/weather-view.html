@@ -1,0 +1,70 @@
+<div class="min-h-screen flex flex-col items-center justify-center p-6 gap-6 transition-all duration-1000"
+     [style.background]="background()">
+
+  <div class="flex gap-2 w-full max-w-md">
+    <input
+      type="text"
+      [(ngModel)]="city"
+      (keyup.enter)="searchWeather()"
+      placeholder="Busca una ciudad..."
+      class="flex-1 px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/50 outline-none focus:border-white/40 backdrop-blur-md"
+    />
+    <button
+      (click)="searchWeather()"
+      class="px-5 py-3 rounded-xl bg-white/20 text-white font-medium hover:bg-white/30 transition backdrop-blur-md"
+    >
+      Buscar
+    </button>
+  </div>
+
+  @if (loading()) {
+    <p class="text-white/70">Cargando...</p>
+  }
+
+  @if (error()) {
+    <p class="text-red-300">No se encontró la ciudad. Inténtalo de nuevo.</p>
+  }
+
+  @if (!weather() && !loading() && !error()) {
+    <div class="text-center text-white/80 mt-8">
+      <lucide-icon [img]="CloudSun" [size]="64" [strokeWidth]="1.2" class="mx-auto mb-4 opacity-70"></lucide-icon>
+      <p class="text-xl font-light">Busca una ciudad para ver su tiempo</p>
+      <p class="text-sm text-white/50 mt-1">Escribe el nombre de cualquier ciudad del mundo</p>
+    </div>
+  }
+
+  @if (weather(); as weather) {
+    <div class="text-white text-center">
+      <h2 class="text-2xl font-semibold">{{ weather.city }}, {{ weather.country }}</h2>
+
+      @if (weatherIcon(); as icon) {
+        <lucide-icon [img]="icon" [size]="80" class="mx-auto my-4" [strokeWidth]="1.5"></lucide-icon>
+      }
+
+      <p class="text-6xl font-light my-2">{{ weather.temp }}°</p>
+      <p class="capitalize">{{ weather.description }}</p>
+      <div class="flex gap-6 mt-4 justify-center">
+        <span>Humedad: {{ weather.humidity }}%</span>
+        <span>Viento: {{ weather.windSpeed }} km/h</span>
+        <span>Sensación: {{ weather.feelsLike }}°</span>
+      </div>
+    </div>
+  }
+
+  @if (forecast().length > 0) {
+    <div class="flex gap-3 flex-wrap justify-center mt-4">
+      @for (day of forecast(); track day.date) {
+        <div class="flex flex-col items-center gap-2 px-4 py-4 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-md min-w-[90px]">
+          <span class="text-white/80 text-sm capitalize">{{ getDayName(day.date) }}</span>
+          @if (getIcon(day.icon); as icon) {
+            <lucide-icon [img]="icon" [size]="32" [strokeWidth]="1.5" class="text-white"></lucide-icon>
+          }
+          <div class="flex gap-2 text-sm">
+            <span class="text-white font-medium">{{ day.tempMax }}°</span>
+            <span class="text-white/50">{{ day.tempMin }}°</span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

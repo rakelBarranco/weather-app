@@ -1,0 +1,19 @@
+:host {
+  display: block;
+}
+
+.sky-dawn {
+  background: linear-gradient(160deg, #ff9a8b 0%, #ff6a88 40%, #ff99ac 100%);
+}
+
+.sky-day {
+  background: radial-gradient(circle at 20% 20%, #2980b9 0%, #2c3e50 100%);
+}
+
+.sky-dusk {
+  background: linear-gradient(160deg, #355c7d 0%, #6c5b7b 50%, #c06c84 100%);
+}
+
+.sky-night {
+  background: radial-gradient(circle at 30% 20%, #1e3a5f 0%, #0f1729 55%, #0a0e1a 100%);
+}
