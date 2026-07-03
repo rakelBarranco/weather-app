@@ -43,12 +43,25 @@
     }
   </div>
 
+  @if (recentCities().length > 0) {
+    <div class="flex gap-2 flex-wrap justify-center max-w-md">
+      @for (recent of recentCities(); track recent.lat + '-' + recent.lon) {
+        <button
+          (click)="selectCity(recent)"
+          class="px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-white/90 text-sm hover:bg-white/20 transition backdrop-blur-md"
+        >
+          {{ recent.name }}
+        </button>
+      }
+    </div>
+  }
+
   @if (loading()) {
     <p class="text-white/70">Cargando...</p>
   }
 
   @if (error()) {
-    <p class="text-red-300">No se encontró la ciudad. Inténtalo de nuevo.</p>
+    <p class="text-red-400 bg-red-500/10 border border-red-500/20 px-4 py-2 rounded-lg">{{ error() }}</p>
   }
 
   @if (!weather() && !loading() && !error()) {

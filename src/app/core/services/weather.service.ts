@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import {CitySuggestion, ForecastDay, Weather} from '../models/weather.model';
 import {environment} from '../../../environments/enviroment';
@@ -105,5 +105,20 @@ export class WeatherService {
         lon: item.lon
       })))
     );
+  }
+
+  getErrorMessage(error: HttpErrorResponse): string {
+    switch (error.status) {
+      case 0:
+        return 'Sin conexión. Comprueba tu red e inténtalo de nuevo.';
+      case 401:
+        return 'Error de autenticación con el servicio meteorológico.';
+      case 404:
+        return 'No se encontró la ciudad. Prueba con otro nombre.';
+      case 429:
+        return 'Demasiadas peticiones. Espera un momento e inténtalo de nuevo.';
+      default:
+        return 'Algo salió mal. Inténtalo de nuevo más tarde.';
+    }
   }
 }
