@@ -25,15 +25,20 @@
     <p class="text-red-300">No se encontró la ciudad. Inténtalo de nuevo.</p>
   }
 
-  @if (weather(); as w) {
+  @if (weather(); as weather) {
     <div class="text-white text-center">
-      <h2 class="text-2xl font-semibold">{{ w.city }}, {{ w.country }}</h2>
-      <p class="text-6xl font-light my-2">{{ w.temp }}°</p>
-      <p class="capitalize">{{ w.description }}</p>
+      <h2 class="text-2xl font-semibold">{{ weather.city }}, {{ weather.country }}</h2>
+
+      @if (weatherIcon(); as icon) {
+        <lucide-icon [img]="icon" [size]="80" class="mx-auto my-4" [strokeWidth]="1.5"></lucide-icon>
+      }
+
+      <p class="text-6xl font-light my-2">{{ weather.temp }}°</p>
+      <p class="capitalize">{{ weather.description }}</p>
       <div class="flex gap-6 mt-4 justify-center">
-        <span>Humedad: {{ w.humidity }}%</span>
-        <span>Viento: {{ w.windSpeed }} km/h</span>
-        <span>Sensación: {{ w.feelsLike }}°</span>
+        <span>Humedad: {{ weather.humidity }}%</span>
+        <span>Viento: {{ weather.windSpeed }} km/h</span>
+        <span>Sensación: {{ weather.feelsLike }}°</span>
       </div>
     </div>
   }

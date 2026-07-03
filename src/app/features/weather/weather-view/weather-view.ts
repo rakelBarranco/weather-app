@@ -1,34 +1,25 @@
-import {Component, computed, inject, signal} from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { LucideAngularModule } from 'lucide-angular';
 import { WeatherService } from '../../../core/services/weather.service';
 import { Weather } from '../../../core/models/weather.model';
-
-const SKY_GRADIENTS: Record<'dawn' | 'day' | 'dusk' | 'night', string> = {
-  dawn: 'linear-gradient(160deg, #614385 0%, #cf8b7f 60%, #f3b7a4 100%)',
-  day: 'radial-gradient(circle at 20% 20%, #2980b9 0%, #2c3e50 100%)',
-  dusk: 'linear-gradient(160deg, #355c7d 0%, #6c5b7b 50%, #c06c84 100%)',
-  night: 'radial-gradient(circle at 30% 20%, #1e3a5f 0%, #0f1729 55%, #0a0e1a 100%)'
-};
+import { SKY_GRADIENTS, WEATHER_ICONS, TimeOfDay } from '../weather.constants';
 
 @Component({
   selector: 'app-weather-view',
-  imports: [FormsModule],
+  imports: [FormsModule, LucideAngularModule],
   templateUrl: './weather-view.html',
   styleUrl: './weather-view.scss',
 })
-
 export default class WeatherViewComponent {
   private weatherService = inject(WeatherService);
-
 
   city = signal('');
   weather = signal<Weather | null>(null);
   loading = signal(false);
   error = signal(false);
 
-  background = computed(() => SKY_GRADIENTS[this.timeOfDay()]);
-
-  timeOfDay = computed<'dawn' | 'day' | 'dusk' | 'night'>(() => {
+  timeOfDay = computed<TimeOfDay>(() => {
     const w = this.weather();
     if (!w) return 'day';
 
@@ -41,6 +32,12 @@ export default class WeatherViewComponent {
     return 'night';
   });
 
+  background = computed(() => SKY_GRADIENTS[this.timeOfDay()]);
+
+  weatherIcon = computed(() => {
+    const w = this.weather();
+    return w ? WEATHER_ICONS[w.icon] ?? null : null;
+  });
 
   searchWeather() {
     const cityName = this.city().trim();
