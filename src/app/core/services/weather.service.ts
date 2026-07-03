@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import {ForecastDay, Weather} from '../models/weather.model';
+import {CitySuggestion, ForecastDay, Weather} from '../models/weather.model';
 import {environment} from '../../../environments/enviroment';
 
 @Injectable({
@@ -11,6 +11,7 @@ export class WeatherService {
   private http = inject(HttpClient);
   private apiKey = environment.openWeather.apiKey;
   private baseUrl = environment.openWeather.baseUrl;
+  private geoUrl = environment.openWeather.geoUrl;
 
   getWeatherByCity(city: string): Observable<Weather> {
     const url = `${this.baseUrl}/weather?q=${city}&units=metric&lang=es&appid=${this.apiKey}`;
@@ -89,6 +90,20 @@ export class WeatherService {
 
     return this.http.get<any>(url).pipe(
       map(response => this.mapToForecast(response))
+    );
+  }
+
+  searchCities(query: string): Observable<CitySuggestion[]> {
+    const url = `${this.geoUrl}/direct?q=${query}&limit=5&appid=${this.apiKey}`;
+
+    return this.http.get<any[]>(url).pipe(
+      map(response => response.map(item => ({
+        name: item.name,
+        country: item.country,
+        state: item.state,
+        lat: item.lat,
+        lon: item.lon
+      })))
     );
   }
 }

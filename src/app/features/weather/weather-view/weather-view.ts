@@ -1,13 +1,17 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {CloudSun,MapPin, LucideAngularModule} from 'lucide-angular';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { debounceTime, distinctUntilChanged, filter, switchMap, catchError, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { CloudSun, MapPin, LucideAngularModule } from 'lucide-angular';
 import { WeatherService } from '../../../core/services/weather.service';
-import {ForecastDay, Weather} from '../../../core/models/weather.model';
+import { ForecastDay, Weather, CitySuggestion } from '../../../core/models/weather.model';
 import { SKY_GRADIENTS, WEATHER_ICONS, TimeOfDay } from '../weather.constants';
+import {NgClass} from '@angular/common';
 
 @Component({
   selector: 'app-weather-view',
-  imports: [FormsModule, LucideAngularModule],
+  imports: [FormsModule, LucideAngularModule, NgClass],
   templateUrl: './weather-view.html',
   styleUrl: './weather-view.scss',
 })
@@ -18,10 +22,12 @@ export default class WeatherViewComponent {
   readonly MapPin = MapPin;
 
   city = signal('');
+  suggestions = signal<CitySuggestion[]>([]);
   weather = signal<Weather | null>(null);
   loading = signal(false);
   error = signal(false);
   forecast = signal<ForecastDay[]>([]);
+  highlightedIndex = signal(-1);
 
   timeOfDay = computed<TimeOfDay>(() => {
     const w = this.weather();
@@ -43,14 +49,32 @@ export default class WeatherViewComponent {
     return w ? WEATHER_ICONS[w.icon] ?? null : null;
   });
 
-  searchWeather() {
-    const cityName = this.city().trim();
-    if (!cityName) return;
+  constructor() {
+    toObservable(this.city).pipe(
+      debounceTime(400),
+      distinctUntilChanged(),
+      tap(query => {
+        if (query.trim().length < 2) {
+          this.suggestions.set([]);
+        }
+      }),
+      filter(query => query.trim().length >= 2),
+      switchMap(query =>
+        this.weatherService.searchCities(query.trim()).pipe(
+          catchError(() => of([]))
+        )
+      )
+    ).subscribe(cities => this.suggestions.set(cities));
+  }
 
+  selectCity(suggestion: CitySuggestion) {
+    this.highlightedIndex.set(-1);
+    this.city.set('');
+    this.suggestions.set([]);
     this.loading.set(true);
     this.error.set(false);
 
-    this.weatherService.getWeatherByCity(cityName).subscribe({
+    this.weatherService.getWeatherByCoords(suggestion.lat, suggestion.lon).subscribe({
       next: (data) => {
         this.weather.set(data);
         this.loading.set(false);
@@ -58,12 +82,11 @@ export default class WeatherViewComponent {
       error: () => {
         this.error.set(true);
         this.weather.set(null);
-        this.forecast.set([]);
         this.loading.set(false);
       }
     });
 
-    this.weatherService.getForecastByCity(cityName).subscribe({
+    this.weatherService.getForecastByCoords(suggestion.lat, suggestion.lon).subscribe({
       next: (data) => this.forecast.set(data),
       error: () => this.forecast.set([])
     });
@@ -86,6 +109,7 @@ export default class WeatherViewComponent {
 
     this.loading.set(true);
     this.error.set(false);
+    this.suggestions.set([]);
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -115,4 +139,22 @@ export default class WeatherViewComponent {
     );
   }
 
+  onArrowDown() {
+    const max = this.suggestions().length - 1;
+    this.highlightedIndex.update(i => (i < max ? i + 1 : 0));
+  }
+
+  onArrowUp() {
+    const max = this.suggestions().length - 1;
+    this.highlightedIndex.update(i => (i > 0 ? i - 1 : max));
+  }
+
+  onEnter() {
+    const cities = this.suggestions();
+    if (cities.length === 0) return;
+
+    const index = this.highlightedIndex();
+    const selected = index >= 0 ? cities[index] : cities[0];
+    this.selectCity(selected);
+  }
 }
