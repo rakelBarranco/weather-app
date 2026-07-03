@@ -9,6 +9,7 @@ import { ForecastDay, Weather, CitySuggestion } from '../../../core/models/weath
 import { SKY_GRADIENTS, WEATHER_ICONS, TimeOfDay } from '../weather.constants';
 import {NgClass} from '@angular/common';
 import {HttpErrorResponse} from '@angular/common/http';
+import {SearchHistoryService} from '../../../core/services/search-history';
 
 @Component({
   selector: 'app-weather-view',
@@ -18,6 +19,7 @@ import {HttpErrorResponse} from '@angular/common/http';
 })
 export default class WeatherViewComponent {
   private weatherService = inject(WeatherService);
+  private searchHistory = inject(SearchHistoryService);
 
   readonly CloudSun = CloudSun;
   readonly MapPin = MapPin;
@@ -29,6 +31,7 @@ export default class WeatherViewComponent {
   error = signal<string | null>(null);
   forecast = signal<ForecastDay[]>([]);
   highlightedIndex = signal(-1);
+  recentCities = this.searchHistory.recentCities;
 
   timeOfDay = computed<TimeOfDay>(() => {
     const w = this.weather();
@@ -69,6 +72,8 @@ export default class WeatherViewComponent {
   }
 
   selectCity(suggestion: CitySuggestion) {
+    this.searchHistory.add(suggestion);
+    this.city.set('');
     this.highlightedIndex.set(-1);
     this.city.set('');
     this.suggestions.set([]);
