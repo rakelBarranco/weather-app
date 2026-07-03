@@ -8,6 +8,7 @@ import { WeatherService } from '../../../core/services/weather.service';
 import { ForecastDay, Weather, CitySuggestion } from '../../../core/models/weather.model';
 import { SKY_GRADIENTS, WEATHER_ICONS, TimeOfDay } from '../weather.constants';
 import {NgClass} from '@angular/common';
+import {HttpErrorResponse} from '@angular/common/http';
 
 @Component({
   selector: 'app-weather-view',
@@ -25,7 +26,7 @@ export default class WeatherViewComponent {
   suggestions = signal<CitySuggestion[]>([]);
   weather = signal<Weather | null>(null);
   loading = signal(false);
-  error = signal(false);
+  error = signal<string | null>(null);
   forecast = signal<ForecastDay[]>([]);
   highlightedIndex = signal(-1);
 
@@ -72,16 +73,17 @@ export default class WeatherViewComponent {
     this.city.set('');
     this.suggestions.set([]);
     this.loading.set(true);
-    this.error.set(false);
+    this.error.set(null);
 
     this.weatherService.getWeatherByCoords(suggestion.lat, suggestion.lon).subscribe({
       next: (data) => {
         this.weather.set(data);
         this.loading.set(false);
       },
-      error: () => {
-        this.error.set(true);
+      error: (err: HttpErrorResponse) => {
+        this.error.set(this.weatherService.getErrorMessage(err));
         this.weather.set(null);
+        this.forecast.set([]);
         this.loading.set(false);
       }
     });
@@ -103,12 +105,12 @@ export default class WeatherViewComponent {
 
   useMyLocation() {
     if (!navigator.geolocation) {
-      this.error.set(true);
+      this.error.set('Tu navegador no admite geolocalización.');
       return;
     }
 
     this.loading.set(true);
-    this.error.set(false);
+    this.error.set(null);
     this.suggestions.set([]);
 
     navigator.geolocation.getCurrentPosition(
@@ -120,8 +122,8 @@ export default class WeatherViewComponent {
             this.weather.set(data);
             this.loading.set(false);
           },
-          error: () => {
-            this.error.set(true);
+          error: (err: HttpErrorResponse) => {
+            this.error.set(this.weatherService.getErrorMessage(err));
             this.weather.set(null);
             this.loading.set(false);
           }
@@ -133,7 +135,7 @@ export default class WeatherViewComponent {
         });
       },
       () => {
-        this.error.set(true);
+        this.error.set('No se pudo obtener tu ubicación. Revisa los permisos.');
         this.loading.set(false);
       }
     );

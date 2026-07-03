@@ -48,7 +48,7 @@
   }
 
   @if (error()) {
-    <p class="text-red-300">No se encontró la ciudad. Inténtalo de nuevo.</p>
+    <p class="text-red-400 bg-red-500/10 border border-red-500/20 px-4 py-2 rounded-lg">{{ error() }}</p>
   }
 
   @if (!weather() && !loading() && !error()) {
