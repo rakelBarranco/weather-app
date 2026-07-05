@@ -11,6 +11,8 @@ export interface Weather {
   sunrise: number;
   sunset: number;
   timezone: number;
+  pressure: number;
+  visibility: number;
 }
 
 export interface ForecastDay {
@@ -29,4 +31,4 @@ export interface CitySuggestion {
   lon: number;
 }
 
-
+export type WeatherType = 'rain' | 'snow' | 'clouds' | 'clear' | 'mist';
