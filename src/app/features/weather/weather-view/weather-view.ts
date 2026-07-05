@@ -5,15 +5,16 @@ import { debounceTime, distinctUntilChanged, filter, switchMap, catchError, tap 
 import { of } from 'rxjs';
 import { CloudSun, MapPin, LucideAngularModule } from 'lucide-angular';
 import { WeatherService } from '../../../core/services/weather.service';
-import { ForecastDay, Weather, CitySuggestion } from '../../../core/models/weather.model';
+import {ForecastDay, Weather, CitySuggestion, WeatherType} from '../../../core/models/weather.model';
 import { SKY_GRADIENTS, WEATHER_ICONS, TimeOfDay } from '../weather.constants';
 import {NgClass} from '@angular/common';
 import {HttpErrorResponse} from '@angular/common/http';
 import {SearchHistoryService} from '../../../core/services/search-history';
+import WeatherBackgroundComponent from '../../../shared/components/weather-animation/weather-animation';
 
 @Component({
   selector: 'app-weather-view',
-  imports: [FormsModule, LucideAngularModule, NgClass],
+  imports: [FormsModule, LucideAngularModule, NgClass, WeatherBackgroundComponent],
   templateUrl: './weather-view.html',
   styleUrl: './weather-view.scss',
 })
@@ -51,6 +52,18 @@ export default class WeatherViewComponent {
   weatherIcon = computed(() => {
     const w = this.weather();
     return w ? WEATHER_ICONS[w.icon] ?? null : null;
+  });
+
+  weatherType = computed<WeatherType>(() => {
+    const w = this.weather();
+    if (!w) return 'clear';
+
+    const main = w.main.toLowerCase();
+    if (main.includes('rain') || main.includes('drizzle')) return 'rain';
+    if (main.includes('snow')) return 'snow';
+    if (main.includes('cloud')) return 'clouds';
+    if (main.includes('mist') || main.includes('fog') || main.includes('haze')) return 'mist';
+    return 'clear';
   });
 
   constructor() {

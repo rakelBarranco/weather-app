@@ -34,7 +34,9 @@ export class WeatherService {
       main: data.weather[0].main,
       sunrise: data.sys.sunrise,
       sunset: data.sys.sunset,
-      timezone: data.timezone
+      timezone: data.timezone,
+      pressure: data.main.pressure,
+      visibility: data.visibility
     };
   }
 

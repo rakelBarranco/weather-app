@@ -1,5 +1,7 @@
-<div class="min-h-screen flex flex-col items-center justify-center p-6 gap-6 transition-all duration-1000"
+<div class="min-h-screen flex flex-col items-center justify-center p-6 gap-6 transition-all duration-1000 relative"
      [style.background]="background()">
+
+  <app-weather-animation [weatherType]="weatherType()"></app-weather-animation>
 
   <div class="w-full max-w-md relative">
     <div class="flex gap-2">
@@ -93,19 +95,38 @@
   }
 
   @if (!loading() && weather(); as weather) {
-    <div class="text-white text-center animate-fade-in-up">
-      <h2 class="text-2xl font-semibold">{{ weather.city }}, {{ weather.country }}</h2>
+    <div class="w-full max-w-2xl animate-fade-in-up">
 
-      @if (weatherIcon(); as icon) {
-        <lucide-icon [img]="icon" [size]="80" class="mx-auto my-4" [strokeWidth]="1.5"></lucide-icon>
-      }
+      <div class="flex justify-between items-start mb-8">
+        <div>
+          <h2 class="font-display text-3xl font-semibold text-white">{{ weather.country }}</h2>
+          <p class="text-white/70 capitalize mt-1">{{ weather.description }}</p>
+        </div>
+        <div class="flex items-center gap-3">
+          @if (weatherIcon(); as icon) {
+            <lucide-icon [img]="icon" [size]="56" [strokeWidth]="1.5" class="text-white"></lucide-icon>
+          }
+          <span class="font-display text-7xl font-extralight text-white">{{ weather.temp }}°</span>
+        </div>
+      </div>
 
-      <p class="text-6xl font-light my-2">{{ weather.temp }}°</p>
-      <p class="capitalize">{{ weather.description }}</p>
-      <div class="flex gap-6 mt-4 justify-center">
-        <span>Humedad: {{ weather.humidity }}%</span>
-        <span>Viento: {{ weather.windSpeed }} km/h</span>
-        <span>Sensación: {{ weather.feelsLike }}°</span>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="rounded-2xl bg-white/8 border border-white/12 p-4 backdrop-blur-md">
+          <p class="text-white/50 text-xs uppercase tracking-wide">Sensación</p>
+          <p class="font-display text-xl font-medium text-white mt-1">{{ weather.feelsLike }}°</p>
+        </div>
+        <div class="rounded-2xl bg-white/8 border border-white/12 p-4 backdrop-blur-md">
+          <p class="text-white/50 text-xs uppercase tracking-wide">Humedad</p>
+          <p class="font-display text-xl font-medium text-white mt-1">{{ weather.humidity }}%</p>
+        </div>
+        <div class="rounded-2xl bg-white/8 border border-white/12 p-4 backdrop-blur-md">
+          <p class="text-white/50 text-xs uppercase tracking-wide">Viento</p>
+          <p class="font-display text-xl font-medium text-white mt-1">{{ weather.windSpeed }} <span class="text-sm">km/h</span></p>
+        </div>
+        <div class="rounded-2xl bg-white/8 border border-white/12 p-4 backdrop-blur-md">
+          <p class="text-white/50 text-xs uppercase tracking-wide">Presión</p>
+          <p class="font-display text-xl font-medium text-white mt-1">{{ weather.pressure }} <span class="text-sm">hPa</span></p>
+        </div>
       </div>
     </div>
   }
