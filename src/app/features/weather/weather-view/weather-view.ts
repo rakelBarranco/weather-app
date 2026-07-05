@@ -177,4 +177,13 @@ export default class WeatherViewComponent {
     const selected = index >= 0 ? cities[index] : cities[0];
     this.selectCity(selected);
   }
+
+  formatTime(timestamp: number, timezone: number): string {
+    const date = new Date((timestamp + timezone) * 1000);
+    return date.toLocaleTimeString('es-ES', {
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'UTC'
+    });
+  }
 }

@@ -46,11 +46,11 @@
   </div>
 
   @if (recentCities().length > 0) {
-    <div class="flex gap-2 flex-wrap justify-center max-w-md">
+    <div class="flex gap-2 flex-nowrap justify-center">
       @for (recent of recentCities(); track recent.lat + '-' + recent.lon) {
         <button
           (click)="selectCity(recent)"
-          class="px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-white/90 text-sm hover:bg-white/20 transition backdrop-blur-md"
+          class="px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-white/90 text-sm hover:bg-white/20 transition backdrop-blur-md whitespace-nowrap shrink-0"
         >
           {{ recent.name }}<span class="text-white/50">, {{ recent.country }}</span>
         </button>
@@ -95,37 +95,46 @@
   }
 
   @if (!loading() && weather(); as weather) {
-    <div class="w-full max-w-2xl animate-fade-in-up">
+    <div class="w-full max-w-5xl grid md:grid-cols-2 gap-8 items-center animate-fade-in-up">
 
-      <div class="flex justify-between items-start mb-8">
-        <div>
-          <h2 class="font-display text-3xl font-semibold text-white">{{ weather.country }}</h2>
-          <p class="text-white/70 capitalize mt-1">{{ weather.description }}</p>
-        </div>
-        <div class="flex items-center gap-3">
+      <div class="flex flex-col items-center md:items-start text-center md:text-left">
+        <h2 class="font-display text-4xl font-semibold text-white">{{ weather.country }}</h2>
+        <p class="text-white/60 capitalize text-lg mt-1">{{ weather.description }}</p>
+
+        <div class="flex items-center gap-4 mt-6">
           @if (weatherIcon(); as icon) {
-            <lucide-icon [img]="icon" [size]="56" [strokeWidth]="1.5" class="text-white"></lucide-icon>
+            <lucide-icon [img]="icon" [size]="90" [strokeWidth]="1.5" class="text-white weather-icon-float"></lucide-icon>
           }
-          <span class="font-display text-7xl font-extralight text-white">{{ weather.temp }}°</span>
+          <span class="font-display text-[9rem] leading-none font-thin text-white">{{ weather.temp }}°</span>
         </div>
       </div>
 
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div class="rounded-2xl bg-white/8 border border-white/12 p-4 backdrop-blur-md">
-          <p class="text-white/50 text-xs uppercase tracking-wide">Sensación</p>
-          <p class="font-display text-xl font-medium text-white mt-1">{{ weather.feelsLike }}°</p>
-        </div>
-        <div class="rounded-2xl bg-white/8 border border-white/12 p-4 backdrop-blur-md">
-          <p class="text-white/50 text-xs uppercase tracking-wide">Humedad</p>
-          <p class="font-display text-xl font-medium text-white mt-1">{{ weather.humidity }}%</p>
-        </div>
-        <div class="rounded-2xl bg-white/8 border border-white/12 p-4 backdrop-blur-md">
-          <p class="text-white/50 text-xs uppercase tracking-wide">Viento</p>
-          <p class="font-display text-xl font-medium text-white mt-1">{{ weather.windSpeed }} <span class="text-sm">km/h</span></p>
-        </div>
-        <div class="rounded-2xl bg-white/8 border border-white/12 p-4 backdrop-blur-md">
-          <p class="text-white/50 text-xs uppercase tracking-wide">Presión</p>
-          <p class="font-display text-xl font-medium text-white mt-1">{{ weather.pressure }} <span class="text-sm">hPa</span></p>
+      <div class="flex flex-col gap-4">
+        <div class="grid grid-cols-2 gap-3">
+          <div class="metric-card">
+            <p class="metric-label">Sensación</p>
+            <p class="metric-value">{{ weather.feelsLike }}°</p>
+          </div>
+          <div class="metric-card">
+            <p class="metric-label">Humedad</p>
+            <p class="metric-value">{{ weather.humidity }}%</p>
+          </div>
+          <div class="metric-card">
+            <p class="metric-label">Viento</p>
+            <p class="metric-value">{{ weather.windSpeed }} <span class="text-base font-normal">km/h</span></p>
+          </div>
+          <div class="metric-card">
+            <p class="metric-label">Presión</p>
+            <p class="metric-value">{{ weather.pressure }} <span class="text-base font-normal">hPa</span></p>
+          </div>
+          <div class="metric-card">
+            <p class="metric-label">Amanecer</p>
+            <p class="metric-value">{{ formatTime(weather.sunrise, weather.timezone) }}</p>
+          </div>
+          <div class="metric-card">
+            <p class="metric-label">Atardecer</p>
+            <p class="metric-value">{{ formatTime(weather.sunset, weather.timezone) }}</p>
+          </div>
         </div>
       </div>
     </div>
