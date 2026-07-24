@@ -1,59 +1,133 @@
-# WeatherApp
+# Weather App
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.1.
+Aplicación web del tiempo desarrollada con **Angular 20** y **Tailwind CSS**, que consume la API de **OpenWeatherMap** para mostrar el clima actual y la previsión de 5 días de cualquier ciudad del mundo.
 
-## Development server
+🔗 **[Ver demo en vivo](URL_PENDIENTE)**
 
-To start a local development server, run:
+![Captura de la aplicación](./docs/screenshot.png)
+
+---
+
+## Características
+
+- **Búsqueda con autocompletado** — sugerencias de ciudades en tiempo real mediante la Geocoding API, con debounce para optimizar las peticiones
+- **Navegación por teclado** — flechas para moverse entre sugerencias y Enter para seleccionar
+- **Geolocalización** — consulta el tiempo de tu ubicación actual con un clic
+- **Previsión de 5 días** — temperaturas máximas y mínimas agrupadas por día
+- **Fondo dinámico** — el gradiente cambia según la hora local de la ciudad consultada (amanecer, día, atardecer, noche)
+- **Animaciones de clima** — partículas en Canvas que representan lluvia, nieve, nubes o niebla según las condiciones reales
+- **Historial de búsquedas** — las últimas 5 ciudades consultadas se guardan en `localStorage`
+- **Manejo de errores** — mensajes específicos según el tipo de fallo (sin conexión, límite de peticiones, ciudad no encontrada)
+- **Diseño responsive** — adaptado a móvil, tablet y escritorio
+
+---
+
+## Tecnologías
+
+| Tecnología | Uso |
+|---|---|
+| Angular 20 | Framework principal, con componentes standalone |
+| TypeScript | Tipado estático en todo el proyecto |
+| Tailwind CSS | Sistema de estilos y diseño responsive |
+| RxJS | Gestión de peticiones asíncronas y debounce en la búsqueda |
+| Signals | Gestión de estado reactivo del componente |
+| Canvas API | Animaciones de partículas según el clima |
+| Lucide Angular | Iconografía |
+| Karma + Jasmine | Tests unitarios |
+| OpenWeatherMap API | Datos meteorológicos y geocodificación |
+
+---
+
+## Decisiones técnicas
+
+**Signals en lugar de RxJS para el estado del componente.** El estado local (ciudad seleccionada, datos del clima, carga, errores) se gestiona con signals por su sencillez y rendimiento. RxJS se reserva para lo que realmente lo necesita: el flujo de búsqueda con `debounceTime`, `distinctUntilChanged` y `switchMap`, que cancela peticiones obsoletas cuando el usuario sigue escribiendo.
+
+**Búsqueda por coordenadas en lugar de por nombre.** La Geocoding API devuelve las coordenadas exactas de cada ciudad sugerida, lo que evita ambigüedades entre ciudades homónimas (por ejemplo, Valencia en España y Valencia en Venezuela).
+
+**Un único componente de animación.** En lugar de crear un componente por tipo de clima, `weather-animation` recibe el tipo como input y selecciona internamente la función de dibujo correspondiente, evitando duplicar la lógica del canvas y el bucle de animación.
+
+**Lazy loading de rutas.** El componente principal se carga de forma diferida con `loadComponent`, reduciendo el tamaño del bundle inicial.
+
+---
+
+## Instalación
+
+Requisitos previos: Node.js 20 o superior y npm.
 
 ```bash
-ng serve
+# Clonar el repositorio
+git clone https://github.com/rakelBarranco/weather-app.git
+cd weather-app
+
+# Instalar dependencias
+npm install
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### Configurar la API key
 
-## Code scaffolding
+La aplicación necesita una clave de OpenWeatherMap. Puedes obtener una gratuita en [openweathermap.org](https://openweathermap.org/api).
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Crea el archivo `src/environments/environment.ts`:
+
+```typescript
+export const environment = {
+  production: false,
+  openWeather: {
+    apiKey: 'TU_API_KEY',
+    baseUrl: 'https://api.openweathermap.org/data/2.5',
+    geoUrl: 'https://api.openweathermap.org/geo/1.0'
+  }
+};
+```
+
+> La clave puede tardar unos minutos en activarse tras registrarte.
+
+### Arrancar el proyecto
 
 ```bash
-ng generate component component-name
+npm start
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+La aplicación estará disponible en `http://localhost:4200`.
+
+---
+
+## Tests
 
 ```bash
-ng generate --help
+# Ejecutar los tests
+npm test
+
+# Ejecutar una sola vez, sin modo watch
+ng test --watch=false
+
+# Generar informe de cobertura
+ng test --watch=false --code-coverage
 ```
 
-## Building
+Los tests cubren el mapeo de datos de la API, el manejo de errores HTTP, la persistencia del historial de búsquedas y la lógica del componente principal.
 
-To build the project run:
+---
 
-```bash
-ng build
+## Estructura del proyecto
+
+```
+src/
+├── app/
+│   ├── core/
+│   │   ├── models/          # Interfaces y tipos compartidos
+│   │   └── services/        # WeatherService y SearchHistoryService
+│   ├── features/
+│   │   └── weather/         # Vista principal y constantes
+│   └── shared/
+│       └── components/      # Componente de animación reutilizable
+└── environments/            # Configuración de la API
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+---
 
-## Running unit tests
+## Autora
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+**Raquel Barranco** — Desarrolladora Frontend
 
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+[Portfolio](https://portfolioraquel-indol.vercel.app) · [LinkedIn](https://www.linkedin.com/in/raquel-barrval-70a9361b5) · [GitHub](https://github.com/rakelBarranco)
