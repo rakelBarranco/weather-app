@@ -1,4 +1,5 @@
-<div class="min-h-screen flex flex-col items-center justify-center p-6 gap-6 transition-all duration-1000 relative"
+<div class="min-h-screen flex flex-col items-center px-4 py-10 sm:p-8 gap-8 sm:gap-10 transition-all duration-1000 relative"
+     [ngClass]="weather() ? 'justify-start pt-16 sm:pt-20' : 'justify-center'"
      [style.background]="background()">
 
   <app-weather-animation [weatherType]="weatherType()"></app-weather-animation>
@@ -12,19 +13,19 @@
         (keydown.arrowdown)="onArrowDown(); $event.preventDefault()"
         (keydown.arrowup)="onArrowUp(); $event.preventDefault()"
         placeholder="Busca una ciudad..."
-        class="flex-1 px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/50 outline-none focus:border-white/40 backdrop-blur-md"
+        class="flex-1 min-w-0 px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/50 outline-none focus:border-white/40 backdrop-blur-md"
       />
       <button
         (click)="useMyLocation()"
         title="Usar mi ubicación"
-        class="px-4 py-3 rounded-xl bg-white/20 text-white hover:bg-white/30 transition backdrop-blur-md flex items-center justify-center"
+        class="shrink-0 px-4 py-3 rounded-xl bg-white/20 text-white hover:bg-white/30 transition backdrop-blur-md flex items-center justify-center"
       >
         <lucide-icon [img]="MapPin" [size]="20"></lucide-icon>
       </button>
     </div>
 
     @if (suggestions().length > 0) {
-      <ul class="absolute z-10 w-full mt-2 rounded-xl bg-slate-800/95 border border-white/15 backdrop-blur-md overflow-hidden">
+      <ul class="absolute z-20 w-full mt-2 rounded-xl bg-slate-800/95 border border-white/15 backdrop-blur-md overflow-hidden">
         @for (suggestion of suggestions(); track suggestion.lat + '-' + suggestion.lon; let i = $index) {
           <li
             (click)="selectCity(suggestion)"
@@ -32,13 +33,13 @@
             [ngClass]="{ 'bg-white/10': highlightedIndex() === i }"
             class="px-4 py-3 text-white hover:bg-white/10 cursor-pointer transition flex items-center gap-2"
           >
-          <lucide-icon [img]="MapPin" [size]="16" class="text-white/50"></lucide-icon>
-          <span>
-          {{ suggestion.name }}<span class="text-white/50">, {{ suggestion.country }}</span>
-            @if (suggestion.state) {
-              <span class="text-white/40 text-sm"> ({{ suggestion.state }})</span>
-            }
-        </span>
+            <lucide-icon [img]="MapPin" [size]="16" class="shrink-0 text-white/50"></lucide-icon>
+            <span class="truncate">
+              {{ suggestion.name }}<span class="text-white/50">, {{ suggestion.country }}</span>
+              @if (suggestion.state) {
+                <span class="text-white/40 text-sm"> ({{ suggestion.state }})</span>
+              }
+            </span>
           </li>
         }
       </ul>
@@ -50,7 +51,7 @@
       @for (recent of recentCities(); track recent.lat + '-' + recent.lon) {
         <button
           (click)="selectCity(recent)"
-          class="px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-white/90 text-sm hover:bg-white/20 transition backdrop-blur-md"
+          class="px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-white/90 text-xs sm:text-sm hover:bg-white/20 hover:-translate-y-0.5 transition-all duration-300 backdrop-blur-md whitespace-nowrap"
         >
           {{ recent.name }}<span class="text-white/50">, {{ recent.country }}</span>
         </button>
@@ -58,89 +59,77 @@
     </div>
   }
 
-  @if (loading()) {
-    <div class="flex flex-col items-center gap-4 animate-pulse mt-8">
-      <div class="h-7 w-48 rounded-lg bg-white/15"></div>
-      <div class="h-20 w-20 rounded-full bg-white/15"></div>
-      <div class="h-16 w-28 rounded-lg bg-white/15"></div>
-      <div class="h-5 w-40 rounded bg-white/15"></div>
-      <div class="flex gap-4 mt-2">
-        <div class="h-5 w-24 rounded bg-white/15"></div>
-        <div class="h-5 w-24 rounded bg-white/15"></div>
-        <div class="h-5 w-24 rounded bg-white/15"></div>
-      </div>
-
-      <div class="flex gap-3 flex-wrap justify-center mt-4">
-        @for (i of [1,2,3,4,5]; track i) {
-          <div class="flex flex-col items-center gap-2 px-4 py-4 rounded-2xl bg-white/10 min-w-[90px]">
-            <div class="h-4 w-10 rounded bg-white/15"></div>
-            <div class="h-8 w-8 rounded-full bg-white/15"></div>
-            <div class="h-4 w-14 rounded bg-white/15"></div>
-          </div>
-        }
-      </div>
-    </div>
-  }
-
   @if (error()) {
-    <p class="text-red-400 bg-red-500/10 border border-red-500/20 px-4 py-2 rounded-lg">{{ error() }}</p>
+    <p class="text-red-400 bg-red-500/10 border border-red-500/20 px-4 py-2 rounded-lg text-center text-sm sm:text-base max-w-md">
+      {{ error() }}
+    </p>
   }
 
   @if (!weather() && !loading() && !error()) {
-    <div class="text-center text-white/80 mt-8">
-      <lucide-icon [img]="CloudSun" [size]="64" [strokeWidth]="1.2" class="mx-auto mb-4 opacity-70"></lucide-icon>
-      <p class="text-xl font-light">Busca una ciudad para ver su tiempo</p>
-      <p class="text-sm text-white/50 mt-1">Escribe el nombre de cualquier ciudad del mundo</p>
+    <div class="text-center text-white/80 px-4 animate-fade-in-up">
+      <lucide-icon [img]="CloudSun" [size]="56" [strokeWidth]="1.2" class="mx-auto mb-4 opacity-70 sm:hidden"></lucide-icon>
+      <lucide-icon [img]="CloudSun" [size]="64" [strokeWidth]="1.2" class="mx-auto mb-4 opacity-70 hidden sm:block"></lucide-icon>
+      <p class="text-lg sm:text-xl font-light">Busca una ciudad para ver su tiempo</p>
+      <p class="text-xs sm:text-sm text-white/50 mt-1">Escribe el nombre de cualquier ciudad del mundo</p>
     </div>
   }
 
   @if (!loading() && weather(); as weather) {
-    <div class="w-full max-w-2xl animate-fade-in-up">
+    <div class="w-full max-w-2xl">
 
-      <div class="flex justify-between items-start mb-8">
-        <div>
-          <h2 class="font-display text-3xl font-semibold text-white">{{ weather.country }}</h2>
-          <p class="text-white/70 capitalize mt-1">{{ weather.description }}</p>
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start items-center text-center sm:text-left gap-5 sm:gap-6 mb-8 sm:mb-10 animate-fade-in-up">
+        <div class="min-w-0">
+          <h2 class="font-display text-2xl sm:text-3xl font-semibold text-white break-words">{{ selectedCityName() }}</h2>
+          <p class="text-white/70 capitalize mt-1 text-sm sm:text-base">{{ weather.description }}</p>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 shrink-0">
           @if (weatherIcon(); as icon) {
-            <lucide-icon [img]="icon" [size]="56" [strokeWidth]="1.5" class="text-white"></lucide-icon>
+            <lucide-icon [img]="icon" [size]="48" [strokeWidth]="1.5" class="text-white weather-icon-float sm:hidden"></lucide-icon>
+            <lucide-icon [img]="icon" [size]="60" [strokeWidth]="1.5" class="text-white weather-icon-float hidden sm:block"></lucide-icon>
           }
-          <span class="font-display text-7xl font-extralight text-white">{{ weather.temp }}°</span>
+          <span class="font-display text-6xl sm:text-7xl font-extralight text-white leading-none">{{ weather.temp }}°</span>
         </div>
       </div>
 
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div class="rounded-2xl bg-white/8 border border-white/12 p-4 backdrop-blur-md">
-          <p class="text-white/50 text-xs uppercase tracking-wide">Sensación</p>
-          <p class="font-display text-xl font-medium text-white mt-1">{{ weather.feelsLike }}°</p>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div class="metric-card stagger-item">
+          <p class="metric-label">Sensación</p>
+          <p class="metric-value">{{ weather.feelsLike }}°</p>
         </div>
-        <div class="rounded-2xl bg-white/8 border border-white/12 p-4 backdrop-blur-md">
-          <p class="text-white/50 text-xs uppercase tracking-wide">Humedad</p>
-          <p class="font-display text-xl font-medium text-white mt-1">{{ weather.humidity }}%</p>
+        <div class="metric-card stagger-item">
+          <p class="metric-label">Humedad</p>
+          <p class="metric-value">{{ weather.humidity }}%</p>
         </div>
-        <div class="rounded-2xl bg-white/8 border border-white/12 p-4 backdrop-blur-md">
-          <p class="text-white/50 text-xs uppercase tracking-wide">Viento</p>
-          <p class="font-display text-xl font-medium text-white mt-1">{{ weather.windSpeed }} <span class="text-sm">km/h</span></p>
+        <div class="metric-card stagger-item">
+          <p class="metric-label">Viento</p>
+          <p class="metric-value">{{ weather.windSpeed }} <span class="metric-unit">km/h</span></p>
         </div>
-        <div class="rounded-2xl bg-white/8 border border-white/12 p-4 backdrop-blur-md">
-          <p class="text-white/50 text-xs uppercase tracking-wide">Presión</p>
-          <p class="font-display text-xl font-medium text-white mt-1">{{ weather.pressure }} <span class="text-sm">hPa</span></p>
+        <div class="metric-card stagger-item">
+          <p class="metric-label">Presión</p>
+          <p class="metric-value">{{ weather.pressure }} <span class="metric-unit">hPa</span></p>
+        </div>
+        <div class="metric-card stagger-item">
+          <p class="metric-label">Amanecer</p>
+          <p class="metric-value">{{ formatTime(weather.sunrise, weather.timezone) }}</p>
+        </div>
+        <div class="metric-card stagger-item">
+          <p class="metric-label">Atardecer</p>
+          <p class="metric-value">{{ formatTime(weather.sunset, weather.timezone) }}</p>
         </div>
       </div>
     </div>
   }
 
   @if (!loading() && forecast().length > 0) {
-    <div class="flex gap-3 overflow-x-auto max-w-full px-2 pb-2 sm:flex-wrap sm:justify-center sm:overflow-visible animate-fade-in-up">
+    <div class="flex gap-3 overflow-x-auto w-full max-w-2xl px-1 pb-2 sm:flex-wrap sm:justify-center sm:overflow-visible">
       @for (day of forecast(); track day.date) {
-        <div class="flex flex-col items-center gap-2 px-4 py-4 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-md min-w-[90px] shrink-0">
-          <span class="text-white/80 text-sm capitalize">{{ getDayName(day.date) }}</span>
+        <div class="forecast-card stagger-item flex flex-col items-center gap-2 px-4 py-4 rounded-2xl min-w-[85px] sm:min-w-[95px] shrink-0">
+          <span class="text-white/60 text-xs sm:text-sm capitalize">{{ getDayName(day.date) }}</span>
           @if (getIcon(day.icon); as icon) {
-            <lucide-icon [img]="icon" [size]="32" [strokeWidth]="1.5" class="text-white"></lucide-icon>
+            <lucide-icon [img]="icon" [size]="30" [strokeWidth]="1.5" class="text-white"></lucide-icon>
           }
-          <div class="flex gap-2 text-sm">
-            <span class="text-white font-medium">{{ day.tempMax }}°</span>
+          <div class="flex gap-2 text-xs sm:text-sm">
+            <span class="text-white font-semibold">{{ day.tempMax }}°</span>
             <span class="text-white/50">{{ day.tempMin }}°</span>
           </div>
         </div>
